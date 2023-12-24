@@ -35,6 +35,7 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
 
   const { fullName, signature, setFullName, setSignature } = useRequiredSigningContext();
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
+  const [method, setMethod] = useState<'signature' | 'image'>('signature');
 
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
@@ -69,6 +70,10 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
     });
 
     router.push(`/sign/${recipient.token}/complete`);
+  };
+
+  const handleSwitchOnClick = (method: 'signature' | 'image') => {
+    setMethod(method);
   };
 
   return (
@@ -116,19 +121,38 @@ export const SigningForm = ({ document, recipient, fields }: SigningFormProps) =
               </div>
 
               <div>
-                <Label htmlFor="Signature">Signature</Label>
+                {method === 'signature' ? (
+                  <>
+                    <Label htmlFor="Signature">Signature</Label>
 
-                <Card className="mt-2" gradient degrees={-120}>
-                  <CardContent className="p-0">
-                    <SignaturePad
-                      className="h-44 w-full"
-                      defaultValue={signature ?? undefined}
-                      onChange={(value) => {
-                        setSignature(value);
-                      }}
-                    />
-                  </CardContent>
-                </Card>
+                    <Card className="mt-2" gradient degrees={-120}>
+                      <CardContent className="p-0">
+                        <SignaturePad
+                          className="h-44 w-full"
+                          defaultValue={signature ?? undefined}
+                          onChange={(value) => {
+                            setSignature(value);
+                          }}
+                        />
+                      </CardContent>
+                    </Card>
+                    <p
+                      className="mt-2 cursor-pointer text-sm underline"
+                      onClick={() => handleSwitchOnClick('image')}
+                    >
+                      Or Upload an image signature
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p
+                      className="mt-2 cursor-pointer text-sm underline"
+                      onClick={() => handleSwitchOnClick('signature')}
+                    >
+                      Or draw a signature
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
